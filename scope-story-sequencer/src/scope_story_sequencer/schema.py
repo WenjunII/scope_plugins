@@ -11,7 +11,7 @@ class StorySequencerConfig(BasePipelineConfig):
     modes: dict = {"video": {"default": True}}
     
     # Mark as a preprocessor so it appears in the preprocessor list, NOT the main pipeline list
-    usage: list = ["PREPROCESSOR"]
+    # usage: list = ["PREPROCESSOR"]
     
     # ------------------
     # INPUTS & STATE
