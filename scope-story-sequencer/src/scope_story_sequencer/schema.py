@@ -1,42 +1,32 @@
 from pydantic import Field
 
-print("DEBUG: Loading scope-story-sequencer schema module...")
+# Fallback base config if not available
+try:
+    from scope.core.pipelines.base_schema import BasePipelineConfig
+except ImportError:
+    from pydantic import BaseModel
+    class BasePipelineConfig(BaseModel):
+        pipeline_id: str
+        pipeline_name: str
+        pipeline_description: str
+        modes: dict = {}
 
-# Helper to mimic old ui_field_config since the module is missing in v0.1.3
-def ui_field_config(label=None, order=None, description=None, component=None):
+# Helper for UI config
+def ui_field_config(label=None, order=None, description=None, component=None, props=None):
     extra = {}
     if label: extra["label"] = label
     if order: extra["order"] = order
     if description: extra["description"] = description
     if component: extra["component"] = component
+    if props: extra["props"] = props
     return extra
 
-# Attempt to import MemFlow config to inherit from it
-try:
-    print("DEBUG: Attempting to import MemflowConfig...")
-    from scope.core.pipelines.memflow.schema import MemflowConfig as BaseConfig
-    print("DEBUG: Success importing MemflowConfig.")
-except ImportError as e:
-    print(f"DEBUG: Failed to import MemflowConfig: {e}")
-    # Fallback: Inherit from BasePipelineConfig
-    try:
-        from scope.core.pipelines.base_schema import BasePipelineConfig as BaseConfig
-    except ImportError:
-        # Fallback for v0.1.3 if BasePipelineConfig is missing or named differently
-        from pydantic import BaseModel
-        class BaseConfig(BaseModel):
-            pipeline_id: str
-            pipeline_name: str
-            pipeline_description: str
-            modes: dict = {}
-
-class StorySequencerConfig(BaseConfig):
+class StorySequencerConfig(BasePipelineConfig):
     pipeline_id: str = "scope-story-sequencer"
-    pipeline_name: str = "Story Sequencer (MemFlow)"
-    pipeline_description: str = "MemFlow wrapper with real-time story sequencing."
+    pipeline_name: str = "Story Sequencer"
+    pipeline_description: str = "A real-time prompt sequencer controlling MemFlow."
     
-    # We inherit 'modes' and 'usage' from MemflowConfig automatically.
-    # We DO NOT set usage=["PREPROCESSOR"] because we want to be a Main Pipeline now.
+    modes: dict = {"video": {"default": True}}
 
     # ------------------
     # STORY INPUTS
@@ -48,6 +38,8 @@ class StorySequencerConfig(BaseConfig):
             label="Current Scene",
             order=10,
             description="The active scene description.",
+            component="textarea",
+            props={"rows": 2}
         )
     )
     
@@ -57,6 +49,8 @@ class StorySequencerConfig(BaseConfig):
             label="Next Scene",
             order=20,
             description="Queue the next scene description here.",
+            component="textarea",
+            props={"rows": 2}
         )
     )
     
@@ -67,13 +61,9 @@ class StorySequencerConfig(BaseConfig):
         json_schema_extra=ui_field_config(
             label="Transition Duration (s)",
             order=30,
-            description="Time to cross-fade between scenes (if model supports it).",
+            description="Time to cross-fade between scenes.",
         )
     )
-    
-    # ------------------
-    # ACTIONS
-    # ------------------
     
     trigger_transition: bool = Field(
         default=False,
@@ -85,30 +75,26 @@ class StorySequencerConfig(BaseConfig):
         )
     )
     
-    is_recording: bool = Field(
-        default=False,
-        json_schema_extra=ui_field_config(
-            label="Record Sequence",
-            order=50,
-            description="If ON, saves timing/prompts to internal memory.",
-        )
+    # ------------------
+    # MEMFLOW PARAMS (Manually Copied)
+    # ------------------
+    # We copy key MemFlow params here so they appear in our UI
+    
+    model_id: str = Field(
+        default="memflow", 
+        json_schema_extra=ui_field_config(label="Model ID", order=100)
     )
     
-    export_json: bool = Field(
-        default=False,
-        json_schema_extra=ui_field_config(
-            label="Export JSON",
-            order=60,
-            description="Save the recorded sequence to a file.",
-            component="pulse"
-        )
+    guidance_scale: float = Field(
+        default=1.5,
+        ge=1.0,
+        le=20.0,
+        json_schema_extra=ui_field_config(label="Guidance Scale", order=110)
     )
     
-    json_filename: str = Field(
-        default="story_sequence.json",
-        json_schema_extra=ui_field_config(
-            label="JSON Filename",
-            order=70,
-            description="Filename for the exported sequence.",
-        )
+    num_inference_steps: int = Field(
+        default=4,
+        ge=1,
+        le=50,
+        json_schema_extra=ui_field_config(label="Steps", order=120)
     )
