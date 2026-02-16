@@ -1,0 +1,14 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "scope-story-sequencer"
+version = "0.1.0"
+description = "A real-time story sequencer and transition controller for Scope."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = []
+
+[project.entry-points."scope"]
+scope-story-sequencer = "scope_story_sequencer"
