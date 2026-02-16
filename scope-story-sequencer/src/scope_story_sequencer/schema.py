@@ -19,7 +19,16 @@ try:
 except ImportError as e:
     print(f"DEBUG: Failed to import MemflowConfig: {e}")
     # Fallback: Inherit from BasePipelineConfig
-    from scope.core.pipelines.base_schema import BasePipelineConfig as BaseConfig
+    try:
+        from scope.core.pipelines.base_schema import BasePipelineConfig as BaseConfig
+    except ImportError:
+        # Fallback for v0.1.3 if BasePipelineConfig is missing or named differently
+        from pydantic import BaseModel
+        class BaseConfig(BaseModel):
+            pipeline_id: str
+            pipeline_name: str
+            pipeline_description: str
+            modes: dict = {}
 
 class StorySequencerConfig(BaseConfig):
     pipeline_id: str = "scope-story-sequencer"

@@ -14,7 +14,15 @@ try:
 except ImportError as e:
     print(f"DEBUG: Failed to import MemflowPipeline: {e}")
     # Fallback: Inherit from base Pipeline (Pass-through mode)
-    from scope.core.pipelines.interface import Pipeline as BasePipeline
+    # If Interface is also missing, try base Pipeline from wherever it is
+    try:
+        from scope.core.pipelines.interface import Pipeline as BasePipeline
+    except ImportError:
+        # Absolute last resort for v0.1.3 if structure is totally different
+        class BasePipeline:
+            def __init__(self, device=None, **kwargs): pass
+            def __call__(self, video, **kwargs): return {"video": video[0] if video else None}
+            def get_config_class(self): return None
 
 class StorySequencerPipeline(BasePipeline):
     def get_config_class(self):
