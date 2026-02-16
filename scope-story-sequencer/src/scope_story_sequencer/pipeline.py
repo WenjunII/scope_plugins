@@ -25,7 +25,8 @@ except ImportError as e:
             def get_config_class(self): return None
 
 class StorySequencerPipeline(BasePipeline):
-    def get_config_class(self):
+    @classmethod
+    def get_config_class(cls):
         return StorySequencerConfig
 
     def __init__(self, device=None, **kwargs):
