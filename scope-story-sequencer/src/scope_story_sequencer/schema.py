@@ -1,7 +1,15 @@
 from pydantic import Field
-from scope.core.ui_schema import ui_field_config
 
 print("DEBUG: Loading scope-story-sequencer schema module...")
+
+# Helper to mimic old ui_field_config since the module is missing in v0.1.3
+def ui_field_config(label=None, order=None, description=None, component=None):
+    extra = {}
+    if label: extra["label"] = label
+    if order: extra["order"] = order
+    if description: extra["description"] = description
+    if component: extra["component"] = component
+    return extra
 
 # Attempt to import MemFlow config to inherit from it
 try:
