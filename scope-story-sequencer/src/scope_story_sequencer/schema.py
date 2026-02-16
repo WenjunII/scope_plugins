@@ -1,11 +1,16 @@
 from pydantic import Field
 from scope.core.ui_schema import ui_field_config
 
+print("DEBUG: Loading scope-story-sequencer schema module...")
+
 # Attempt to import MemFlow config to inherit from it
 try:
+    print("DEBUG: Attempting to import MemflowConfig...")
     from scope.core.pipelines.memflow.schema import MemflowConfig as BaseConfig
-except ImportError:
-    # Fallback if we are checking this file outside of the Scope environment
+    print("DEBUG: Success importing MemflowConfig.")
+except ImportError as e:
+    print(f"DEBUG: Failed to import MemflowConfig: {e}")
+    # Fallback: Inherit from BasePipelineConfig
     from scope.core.pipelines.base_schema import BasePipelineConfig as BaseConfig
 
 class StorySequencerConfig(BaseConfig):

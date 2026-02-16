@@ -4,11 +4,16 @@ import torch
 from scope.core.plugins.hookspecs import hookimpl
 from .schema import StorySequencerConfig
 
+print("DEBUG: Loading scope-story-sequencer pipeline module...")
+
 # Attempt to import MemFlow pipeline to inherit from it
 try:
+    print("DEBUG: Attempting to import MemflowPipeline...")
     from scope.core.pipelines.memflow.pipeline import MemflowPipeline as BasePipeline
-except ImportError:
-    # Fallback for development/docs
+    print("DEBUG: Success importing MemflowPipeline.")
+except ImportError as e:
+    print(f"DEBUG: Failed to import MemflowPipeline: {e}")
+    # Fallback: Inherit from base Pipeline (Pass-through mode)
     from scope.core.pipelines.interface import Pipeline as BasePipeline
 
 class StorySequencerPipeline(BasePipeline):
