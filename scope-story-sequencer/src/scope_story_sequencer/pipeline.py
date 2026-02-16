@@ -2,7 +2,6 @@ import json
 import time
 import torch
 from scope.core.pipelines.interface import Pipeline
-from scope.core.pipelines.requirements import Requirements
 from scope.core.plugins.hookspecs import hookimpl
 from .schema import StorySequencerConfig
 
@@ -29,7 +28,7 @@ class StorySequencerPipeline(Pipeline):
     def prepare(self):
         # We need video input (or at least metadata stream)
         # But this preprocessor mostly manipulates metadata (prompts)
-        return Requirements(input_size=512)
+        return None
 
     def __call__(self, video: list[torch.Tensor], **kwargs) -> dict:
         # 1. READ PARAMS from kwargs (Standard Scope Pattern)

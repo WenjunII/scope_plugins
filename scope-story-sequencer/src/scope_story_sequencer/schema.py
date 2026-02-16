@@ -1,5 +1,5 @@
 from pydantic import Field
-from scope.core.pipelines.base_schema import BasePipelineConfig, UsageType
+from scope.core.pipelines.base_schema import BasePipelineConfig
 from scope.core.ui_schema import ui_field_config
 
 class StorySequencerConfig(BasePipelineConfig):
@@ -11,7 +11,7 @@ class StorySequencerConfig(BasePipelineConfig):
     modes: dict = {"video": {"default": True}}
     
     # Mark as a preprocessor so it appears in the preprocessor list, NOT the main pipeline list
-    usage: list = [UsageType.PREPROCESSOR]
+    usage: list = ["PREPROCESSOR"]
     
     # ------------------
     # INPUTS & STATE
