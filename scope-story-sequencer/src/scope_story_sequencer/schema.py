@@ -1,20 +1,23 @@
 from pydantic import Field
-from scope.core.pipelines.base_schema import BasePipelineConfig
 from scope.core.ui_schema import ui_field_config
 
-class StorySequencerConfig(BasePipelineConfig):
+# Attempt to import MemFlow config to inherit from it
+try:
+    from scope.core.pipelines.memflow.schema import MemflowConfig as BaseConfig
+except ImportError:
+    # Fallback if we are checking this file outside of the Scope environment
+    from scope.core.pipelines.base_schema import BasePipelineConfig as BaseConfig
+
+class StorySequencerConfig(BaseConfig):
     pipeline_id: str = "scope-story-sequencer"
-    pipeline_name: str = "Story Sequencer"
-    pipeline_description: str = "A real-time prompt sequencer and transition controller."
+    pipeline_name: str = "Story Sequencer (MemFlow)"
+    pipeline_description: str = "MemFlow wrapper with real-time story sequencing."
     
-    # Defaults to VIDEO mode (preprocessor)
-    modes: dict = {"video": {"default": True}}
-    
-    # Mark as a preprocessor so it appears in the preprocessor list, NOT the main pipeline list
-    # usage: list = ["PREPROCESSOR"]
-    
+    # We inherit 'modes' and 'usage' from MemflowConfig automatically.
+    # We DO NOT set usage=["PREPROCESSOR"] because we want to be a Main Pipeline now.
+
     # ------------------
-    # INPUTS & STATE
+    # STORY INPUTS
     # ------------------
     
     current_prompt: str = Field(
@@ -42,7 +45,7 @@ class StorySequencerConfig(BasePipelineConfig):
         json_schema_extra=ui_field_config(
             label="Transition Duration (s)",
             order=30,
-            description="Time to cross-fade between scenes.",
+            description="Time to cross-fade between scenes (if model supports it).",
         )
     )
     
